@@ -85,3 +85,149 @@ sudo snap install code --classic
 - Dùng để **rút gọn thao tác**, không cần xác nhận thủ công
 
 ---
+
+
+# 🐧 Hướng Dẫn Cài Đặt & Cấu Hình Ubuntu Cho Lập Trình (tiếp theo)
+
+## ✅ 1. Cập nhật hệ thống
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+---
+
+## ✅ 2. Cài phần mềm cần thiết
+```bash
+sudo apt install git curl wget g++ build-essential python3 python3-pip python3-venv snapd fonts-firacode gnome-tweaks zsh -y
+sudo snap install code --classic
+```
+
+---
+
+## ✅ 3. Cài tiếng Việt (tuỳ chọn)
+```bash
+sudo apt install language-pack-vi -y
+```
+
+---
+
+## ✅ 4. Gỡ ứng dụng không cần thiết
+```bash
+sudo apt remove thunderbird libreoffice* -y
+sudo apt autoremove -y
+```
+
+---
+
+## ✅ 5. Cài theme đẹp (tuỳ chọn)
+```bash
+sudo apt install gnome-tweaks -y
+```
+
+---
+
+## ✅ 6. Cài ZSH + Oh My Zsh
+```bash
+sudo apt install zsh -y
+chsh -s $(which zsh)
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+---
+
+## ✅ 7. Cài Node.js (qua NVM)
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc  # hoặc ~/.zshrc nếu dùng zsh
+nvm install --lts
+node -v
+npm -v
+```
+
+---
+
+## ✅ 8. Cài MongoDB
+```bash
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+sudo apt update
+sudo apt install -y mongodb-org
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+
+---
+
+## ✅ 9. Cài PostgreSQL
+```bash
+sudo apt install postgresql postgresql-contrib -y
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+---
+
+## ✅ 10. Cài Docker + Docker Compose
+```bash
+sudo apt install ca-certificates curl gnupg -y
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+---
+
+## ✅ 11. Cài & cấu hình NGINX (tuỳ chọn)
+```bash
+sudo apt install nginx -y
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+
+---
+
+## ✅ 12. Cấu hình GitHub (nhiều tài khoản Git)
+**Bước 1: Tạo SSH Key**
+```bash
+ssh-keygen -t ed25519 -C "youremail@example.com"
+```
+
+**Bước 2: Tạo file cấu hình Git**
+```bash
+touch ~/.ssh/config
+```
+
+**Ví dụ file `~/.ssh/config`:**
+```
+# Tài khoản GitHub chính
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519
+
+# Tài khoản GitHub phụ
+Host github-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+```
+
+**Bước 3: Dùng Git config theo từng thư mục**
+```bash
+git config user.name "Tên của bạn"
+git config user.email "email@example.com"
+```
+
+---
+
+## 💡 Ghi chú
+
+- `-y` là auto "yes", không cần xác nhận
+- Có thể restart máy sau khi cài Docker, Mongo, PostgreSQL
+
+---
+
