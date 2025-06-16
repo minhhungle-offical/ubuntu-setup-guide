@@ -182,3 +182,9 @@ git config user.email "email@example.com"
 
 ---
 
+## ✅ 14. Cài bộ gõ tiếng Việt 
+```bash
+sudo apt install ibus-unikey -y
+ibus restart
+```
+
