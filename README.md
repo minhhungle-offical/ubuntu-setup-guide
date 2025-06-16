@@ -87,6 +87,7 @@ sudo snap install code --classic
 
 ## ✅ 8. Cài Node.js (qua NVM)
 ```bash
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 source ~/.bashrc  # hoặc ~/.zshrc nếu dùng zsh
 nvm install --lts
