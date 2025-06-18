@@ -156,11 +156,11 @@ ssh -T git@github.com
 
 **Bước 2: Tạo file cấu hình Git**
 ```bash
+cd ~/.ssh
 touch ~/.ssh/config
 ```
 
-**Ví dụ file `~/.ssh/config`:**
-```
+```bash
 # Tài khoản GitHub chính
 Host github.com
   HostName github.com
