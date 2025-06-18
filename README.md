@@ -93,6 +93,9 @@ source ~/.bashrc  # hoặc ~/.zshrc nếu dùng zsh
 nvm install --lts
 node -v
 npm -v
+npm install -g yarn
+npm install -g pnpm
+npm install -g typescript ts-node @types/node
 ```
 
 ---
