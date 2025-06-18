@@ -145,6 +145,10 @@ sudo systemctl enable nginx
 **Bước 1: Tạo SSH Key**
 ```bash
 ssh-keygen -t ed25519 -C "youremail@example.com"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+cat ~/.ssh/id_ed25519.pub
+ssh -T git@github.com
 ```
 
 **Bước 2: Tạo file cấu hình Git**
