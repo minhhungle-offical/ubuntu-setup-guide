@@ -96,7 +96,7 @@ node -v
 npm -v
 npm install -g yarn
 npm install -g pnpm
-npm install -g typescript ts-node @types/node
+npm install -g typescript ts-node tslib @types/node
 ```
 
 ---
