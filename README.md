@@ -21,7 +21,8 @@ sudo apt update && sudo apt upgrade -y
 | Python 3         | `sudo apt install python3 python3-pip python3-venv -y`     |
 | Snap             | `sudo apt install snapd -y`                                |
 | VSCode           | `sudo snap install code --classic`                         |
-| Font Fira Code   | `sudo apt install fonts-firacode -y`                       |
+| Font Fira Code   | `sudo add-apt-repository universe -y`                       |
+|                  | `sudo apt install fonts-firacode -y`                       |
 | Gnome Tweaks     | `sudo apt install gnome-tweaks -y`                         |
 | Zsh              | `sudo apt install zsh -y`                                  |
 | Oh My Zsh        | Xem mục 6 bên dưới                                         |
