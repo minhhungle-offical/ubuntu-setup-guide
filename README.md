@@ -207,7 +207,13 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 ```
 ## 🧨 SCRIPT:secure-ssh.sh
 
+```bash
 
+sudo nano ssh-hardening-mode.sh
+# Dán code vào
+sudo chmod +x ssh-hardening-mode.sh
+sudo ./ssh-hardening-mode.sh
+```
 
 ```bash
 
@@ -221,6 +227,8 @@ sudo systemctl disable ssh
 # (tuỳ chọn) Xoá port khỏi firewall
 sudo ufw delete allow 2222
 ```
+
+# ssh-hardening-mode.sh
 
 ```bash
 
