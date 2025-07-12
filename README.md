@@ -205,3 +205,90 @@ sudo apt install ibus-bamboo
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt install ./google-chrome-stable_current_amd64.deb
 ```
+## 🧨 SCRIPT:secure-ssh.sh
+
+sudo apt install openssh-server -y
+
+```bash
+
+#!/bin/bash
+
+set -e
+
+# === Configurable Variables ===
+NEW_PORT=2222
+ALLOWED_GROUP="sshusers"
+BACKUP_FILE="/etc/ssh/sshd_config.bak"
+sshd_config="/etc/ssh/sshd_config"
+
+# === Sanity Check ===
+if [[ $EUID -ne 0 ]]; then
+  echo "❌ Run this script as root"
+  exit 1
+fi
+
+# === Step 0: Warn if no SSH key exists ===
+if ! grep -q "ssh-" "$HOME/.ssh/authorized_keys" 2>/dev/null; then
+  echo "⚠️  No SSH key found in ~/.ssh/authorized_keys"
+  echo "👉  You may be locked out if password auth is disabled!"
+  read -p "❗ Continue anyway? (y/N): " confirm
+  [[ $confirm =~ ^[Yy]$ ]] || exit 1
+fi
+
+# === Step 1: Backup config ===
+cp "$sshd_config" "$BACKUP_FILE"
+echo "[+] Backed up $sshd_config to $BACKUP_FILE"
+
+# === Step 2: Create allowed group ===
+groupadd -f "$ALLOWED_GROUP"
+echo "[+] Group '$ALLOWED_GROUP' ensured"
+
+# === Step 3: Add current user to group ===
+CURRENT_USER=$(logname)
+usermod -aG "$ALLOWED_GROUP" "$CURRENT_USER"
+echo "[+] Added user '$CURRENT_USER' to group '$ALLOWED_GROUP'"
+
+# === Step 4: Modify SSH config ===
+function set_sshd_config() {
+  local key="$1"
+  local value="$2"
+  grep -q "^${key}" "$sshd_config" && \
+    sed -i "s|^${key}.*|${key} ${value}|" "$sshd_config" || \
+    echo "${key} ${value}" >> "$sshd_config"
+}
+
+set_sshd_config "Port" "$NEW_PORT"
+set_sshd_config "PermitRootLogin" "no"
+set_sshd_config "PasswordAuthentication" "no"
+set_sshd_config "ChallengeResponseAuthentication" "no"
+set_sshd_config "UsePAM" "no"
+set_sshd_config "AllowGroups" "$ALLOWED_GROUP"
+set_sshd_config "Ciphers" "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes256-ctr"
+set_sshd_config "MACs" "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com"
+set_sshd_config "KexAlgorithms" "curve25519-sha256,curve25519-sha256@libssh.org"
+
+echo "[+] SSH configuration hardened"
+
+# === Step 5: UFW allow port if active ===
+if systemctl is-active --quiet ufw; then
+  ufw allow "$NEW_PORT"/tcp
+  echo "[+] UFW rule added for port $NEW_PORT"
+fi
+
+# === Step 6: Reload or restart SSH ===
+if systemctl list-units --type=service | grep -q ssh.service; then
+  systemctl restart ssh || systemctl restart sshd
+  echo "[+] SSH service restarted"
+else
+  echo "⚠️ SSH service not found to restart"
+fi
+
+# === Done ===
+echo
+echo "✅ SSH Harden Complete"
+echo ">> New Port        : $NEW_PORT"
+echo ">> Root Login       : Disabled"
+echo ">> Password Auth    : Disabled"
+echo ">> Allowed Group    : $ALLOWED_GROUP"
+echo ">> Backup Config    : $BACKUP_FILE"
+...
