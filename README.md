@@ -207,9 +207,19 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 ```
 ## 🧨 SCRIPT:secure-ssh.sh
 
-sudo apt install openssh-server -y
+
 
 ```bash
+
+sudo apt install openssh-server -y
+# Tắt dịch vụ sshd (SSH server)
+sudo systemctl stop ssh
+
+# Tắt tự động chạy lúc khởi động
+sudo systemctl disable ssh
+
+# (tuỳ chọn) Xoá port khỏi firewall
+sudo ufw delete allow 2222
 
 #!/bin/bash
 
