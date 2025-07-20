@@ -43,7 +43,7 @@ Sau đó vào **Settings → Region & Language** để chuyển sang Tiếng Vi�
 sudo apt remove thunderbird libreoffice* -y
 sudo apt autoremove -y
 ```
-
+mint_impenetrable
 ---
 
 ## ✅ 5. Cài theme và icon đẹp (tuỳ chọn)
@@ -223,136 +223,69 @@ sudo apt install code
 ## 🧨 SCRIPT:secure-ssh.sh
 
 ```bash
-
-sudo nano ssh-hardening-mode.sh
-# Dán code vào
-sudo chmod +x ssh-hardening-mode.sh
-sudo ./ssh-hardening-mode.sh
-```
-
-```bash
-
-sudo apt install openssh-server -y
-# Tắt dịch vụ sshd (SSH server)
-sudo systemctl stop ssh
-
-# Tắt tự động chạy lúc khởi động
-sudo systemctl disable ssh
-
-# (tuỳ chọn) Xoá port khỏi firewall
-sudo ufw delete allow 2222
-```
-
-# ssh-hardening-mode.sh
-
-```bash
-
 #!/bin/bash
-
 set -e
 
-# === CONFIG ===
-NEW_PORT=2222
-ALLOWED_GROUP="sshusers"
-sshd_config="/etc/ssh/sshd_config"
-BACKUP_FILE="/etc/ssh/sshd_config.bak"
+echo "🛡️  Mint Lockdown Mode - IMPENETRABLE"
+echo "------------------------------------"
 
-echo "🔐 SSH Hardening for Personal Linux Machine"
-echo "------------------------------------------"
-echo "Select Mode:"
-echo "  1) Harden SSH server (secure but still accessible)"
-echo "  2) Disable SSH server completely (impenetrable mode)"
-read -p "👉 Enter choice (1 or 2): " mode
-
-# === Check root ===
+# === Root check ===
 if [[ $EUID -ne 0 ]]; then
   echo "❌ Must run as root."
   exit 1
 fi
 
-# === Common Firewall Setup ===
-echo "[+] Setting firewall: deny incoming / allow outgoing"
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw --force enable
+# === Firewall rules ===
+echo "[+] Configuring UFW firewall (deny all incoming)"
+ufw --force reset
+ufw default deny incoming
+ufw default allow outgoing
 
-if [[ "$mode" == "1" ]]; then
-  echo "🔧 MODE 1: Harden SSH server"
+# Optional: block ping (ICMP)
+echo "[+] Blocking ICMP ping requests"
+iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
+iptables -A OUTPUT -p icmp --icmp-type echo-reply -j DROP
 
-  # Step 0: Warn
-  if ! grep -q "ssh-" "$HOME/.ssh/authorized_keys" 2>/dev/null; then
-    echo "⚠️  No SSH key found in ~/.ssh/authorized_keys"
-    echo "👉  You may be locked out if password auth is disabled!"
-    read -p "❗ Continue anyway? (y/N): " confirm
-    [[ $confirm =~ ^[Yy]$ ]] || exit 1
-  fi
+# === Disable SSH ===
+echo "[+] Disabling SSH server completely"
+systemctl stop ssh || true
+systemctl stop sshd || true
+systemctl disable ssh || true
+systemctl disable sshd || true
+ufw delete allow 22/tcp 2>/dev/null || true
 
-  # Step 1: Backup
-  cp "$sshd_config" "$BACKUP_FILE"
-  echo "[+] Backed up $sshd_config to $BACKUP_FILE"
+# === Disable unnecessary services ===
+echo "[+] Disabling unnecessary services"
+systemctl disable avahi-daemon.socket || true
+systemctl disable avahi-daemon.service || true
+systemctl disable cups || true
+systemctl disable bluetooth || true
 
-  # Step 2: Group and user setup
-  groupadd -f "$ALLOWED_GROUP"
-  CURRENT_USER=$(logname)
-  usermod -aG "$ALLOWED_GROUP" "$CURRENT_USER"
-  echo "[+] Ensured group '$ALLOWED_GROUP', added user '$CURRENT_USER'"
+# === Optional: Disable IPv6 ===
+echo "[+] Disabling IPv6 (optional)"
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1
+echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
+echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
 
-  # Step 3: Modify SSH config
-  function set_sshd_config() {
-    local key="$1"
-    local value="$2"
-    grep -q "^${key}" "$sshd_config" && \
-      sed -i "s|^${key}.*|${key} ${value}|" "$sshd_config" || \
-      echo "${key} ${value}" >> "$sshd_config"
-  }
+# === Enable Firewall ===
+ufw --force enable
+echo "[+] Firewall enabled and system hardened"
 
-  set_sshd_config "Port" "$NEW_PORT"
-  set_sshd_config "PermitRootLogin" "no"
-  set_sshd_config "PasswordAuthentication" "no"
-  set_sshd_config "ChallengeResponseAuthentication" "no"
-  set_sshd_config "UsePAM" "no"
-  set_sshd_config "AllowGroups" "$ALLOWED_GROUP"
-  set_sshd_config "Ciphers" "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes256-ctr"
-  set_sshd_config "MACs" "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com"
-  set_sshd_config "KexAlgorithms" "curve25519-sha256,curve25519-sha256@libssh.org"
-
-  # Step 4: UFW allow port
-  ufw allow "$NEW_PORT"/tcp
-  echo "[+] UFW rule added for port $NEW_PORT"
-
-  # Step 5: Restart SSH service
-  systemctl restart ssh || systemctl restart sshd
-  echo "[+] SSH server restarted"
-
-  # Step 6: Summary
-  echo
-  echo "✅ SSH Hardened Successfully"
-  echo ">> Port            : $NEW_PORT"
-  echo ">> Root Login      : Disabled"
-  echo ">> Password Auth   : Disabled"
-  echo ">> Allowed Group   : $ALLOWED_GROUP"
-  echo ">> Backup Config   : $BACKUP_FILE"
-
-elif [[ "$mode" == "2" ]]; then
-  echo "🛑 MODE 2: Disable SSH server completely"
-
-  systemctl stop ssh || true
-  systemctl disable ssh || true
-
-  ufw delete allow 2222/tcp 2>/dev/null || true
-  ufw delete allow 22/tcp 2>/dev/null || true
-
-  echo "✅ SSH server disabled and firewall cleaned"
-
-else
-  echo "❌ Invalid selection"
-  exit 1
-fi
-
-# Final check
-echo
-echo "📡 Testing connectivity..."
-ping -c 1 google.com &>/dev/null && echo "🌍 Internet: OK" || echo "🌍 Internet: FAIL"
+# === Test Internet/GitHub ===
+echo; echo "📡 Connectivity check..."
+ping -c 1 8.8.8.8 &>/dev/null && echo "🌍 Internet: OK" || echo "🌍 Internet: FAIL"
 ssh -T git@github.com &>/dev/null && echo "🧬 GitHub SSH: OK" || echo "🧬 GitHub SSH: FAIL"
 
-...
+echo
+echo "✅ IMPENETRABLE MODE ACTIVATED"
+echo "🚫 No incoming connections allowed"
+echo "🟢 Outgoing access preserved (browser, apt, git...)"
+
+
+
+```bash
+
+
+
+
