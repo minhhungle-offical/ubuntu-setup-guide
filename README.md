@@ -270,17 +270,15 @@ systemctl disable sshd 2>/dev/null || true
 ufw delete allow 22/tcp 2>/dev/null || true
 
 # === Disable unnecessary services ===
-# Avahi (mDNS / LAN discovery)
-systemctl disable avahi-daemon.service || true
-systemctl disable avahi-daemon.socket || true
+echo "[+] Disabling unnecessary services (non-blocking)"
+for svc in cups.service cups.socket cups.path bluetooth.service; do
+  systemctl disable "$svc" 2>/dev/null || true
+done
 
-# CUPS (in ấn)
-systemctl disable cups.service || true
-systemctl disable cups.socket || true
-systemctl disable cups.path || true
-
-# Bluetooth
-systemctl disable bluetooth.service || true
+# ⚠️ Avahi gây chậm GUI, chỉ disable nếu chắc chắn không cần
+echo "[?] Skipping avahi disable to prevent GUI timeout"
+# systemctl disable avahi-daemon.service || true
+# systemctl disable avahi-daemon.socket || true
 
 # === Optional: Disable IPv6 ===
 echo "[+] Disabling IPv6 (optional)"
