@@ -61,7 +61,15 @@ sudo apt install gnome-tweaks -y
 ```bash
 sudo apt install zsh -y
 chsh -s $(which zsh)
-```
+```echo "[+] Disabling SSH server completely"
+
+systemctl stop ssh 2>/dev/null || true
+systemctl stop sshd 2>/dev/null || true
+systemctl disable ssh 2>/dev/null || true
+systemctl disable sshd 2>/dev/null || true
+
+ufw delete allow 22/tcp 2>/dev/null || true
+
 
 Cài **Oh My Zsh**:
 ```bash
@@ -252,10 +260,12 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply -j DROP
 
 # === Disable SSH ===
 echo "[+] Disabling SSH server completely"
-systemctl stop ssh || true
-systemctl stop sshd || true
-systemctl disable ssh || true
-systemctl disable sshd || true
+
+systemctl stop ssh 2>/dev/null || true
+systemctl stop sshd 2>/dev/null || true
+systemctl disable ssh 2>/dev/null || true
+systemctl disable sshd 2>/dev/null || true
+
 ufw delete allow 22/tcp 2>/dev/null || true
 
 # === Disable unnecessary services ===
