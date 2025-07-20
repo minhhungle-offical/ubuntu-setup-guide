@@ -220,8 +220,12 @@ sudo apt install code
 ```
 
 
-## 🧨 SCRIPT:secure-ssh.sh
-
+## 🧨 SCRIPT:mint_impenetrable.sh
+```bash
+sudo nano mint_impenetrable.sh
+chmod +x mint_impenetrable.sh
+sudo ./mint_impenetrable.sh
+```
 ```bash
 #!/bin/bash
 set -e
@@ -281,10 +285,7 @@ echo
 echo "✅ IMPENETRABLE MODE ACTIVATED"
 echo "🚫 No incoming connections allowed"
 echo "🟢 Outgoing access preserved (browser, apt, git...)"
-
-
-
-```bash
+```
 
 
 
