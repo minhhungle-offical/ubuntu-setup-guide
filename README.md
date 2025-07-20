@@ -162,13 +162,13 @@ touch ~/.ssh/config
 ```
 
 ```bash
-# Tài khoản GitHub chính
+# Personal account
 Host github.com
   HostName github.com
   User git
   IdentityFile ~/.ssh/id_ed25519
 
-# Tài khoản GitHub phụ
+# Working account
 Host github-work
   HostName github.com
   User git
@@ -205,6 +205,21 @@ sudo apt install ibus-bamboo
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt install ./google-chrome-stable_current_amd64.deb
 ```
+
+0
+## ✅ 16. Cài vscode
+```bash
+sudo apt update
+sudo apt install wget gpg
+
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
+sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+sudo apt update
+sudo apt install code
+```
+
+
 ## 🧨 SCRIPT:secure-ssh.sh
 
 ```bash
