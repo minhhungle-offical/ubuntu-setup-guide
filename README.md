@@ -270,11 +270,17 @@ systemctl disable sshd 2>/dev/null || true
 ufw delete allow 22/tcp 2>/dev/null || true
 
 # === Disable unnecessary services ===
-echo "[+] Disabling unnecessary services"
-systemctl disable avahi-daemon.socket || true
+# Avahi (mDNS / LAN discovery)
 systemctl disable avahi-daemon.service || true
-systemctl disable cups || true
-systemctl disable bluetooth || true
+systemctl disable avahi-daemon.socket || true
+
+# CUPS (in ấn)
+systemctl disable cups.service || true
+systemctl disable cups.socket || true
+systemctl disable cups.path || true
+
+# Bluetooth
+systemctl disable bluetooth.service || true
 
 # === Optional: Disable IPv6 ===
 echo "[+] Disabling IPv6 (optional)"
