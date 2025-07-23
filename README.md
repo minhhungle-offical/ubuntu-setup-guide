@@ -227,7 +227,14 @@ sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode s
 sudo apt update
 sudo apt install code
 ```
+## ✅ 17. Cài Yarn
+```bash
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo tee /etc/apt/trusted.gpg.d/yarn.gpg > /dev/null
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update
+sudo apt install yarn
 
+```
 
 ## 🧨 SCRIPT:mint_impenetrable.sh
 ```bash
