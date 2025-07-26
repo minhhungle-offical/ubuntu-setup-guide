@@ -24,6 +24,7 @@ sudo apt update && sudo apt upgrade -y
 | Font Fira Code   | `sudo add-apt-repository universe -y`                       |
 |                  | `sudo apt install fonts-firacode -y`                       |
 | Gnome Tweaks     | `sudo apt install gnome-tweaks -y`                         |
+| disk-utility     | `sudo apt install gnome-disk-utility`                         |
 | Zsh              | `sudo apt install zsh -y`                                  |
 | Oh My Zsh        | Xem mục 6 bên dưới                                         |
 
