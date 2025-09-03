@@ -157,7 +157,7 @@ sudo systemctl enable nginx
 ## ✅ 13. Cấu hình GitHub (nhiều tài khoản Git)
 **Bước 1: Tạo SSH Key**
 ```bash
-ssh-keygen -t ed25519 -C "youremail@example.com"
+ssh-keygen -t ed25519 -C "minhhungle.offical@gmail.com"
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 cat ~/.ssh/id_ed25519.pub
